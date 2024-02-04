@@ -3,6 +3,38 @@ import React, {useState} from 'react';
 const Problem1 = () => {
 
     const [show, setShow] = useState('all');
+    
+    const [tasks, setTasks] = useState([]);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const name = formData.get("name");
+        const status = formData.get("status");
+        console.log(name,status)
+        const newTask = { name, status };
+
+        setTasks([...tasks, newTask]);
+        console.log(tasks)
+    };
+    const filteredTasks = tasks.filter(task => {
+        if (show === 'all') return true;
+        return task.status === show;
+    });
+
+    const sortedTasks=filteredTasks.sort((a, b) => {
+        const statusOrder = {
+            "active": 1,
+            "completed": 2
+        };
+        
+        const orderA = statusOrder[a.status] || 3; 
+        const orderB = statusOrder[b.status] || 3; 
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        } else {
+            return a.name.localeCompare(b.name);
+        }
+    });
 
     const handleClick = (val) =>{
         setShow(val);
@@ -14,12 +46,12 @@ const Problem1 = () => {
             <div className="row justify-content-center mt-5">
                 <h4 className='text-center text-uppercase mb-5'>Problem-1</h4>
                 <div className="col-6 ">
-                    <form className="row gy-2 gx-3 align-items-center mb-4">
+                    <form className="row gy-2 gx-3 align-items-center mb-4" onSubmit={handleSubmit}>
                         <div className="col-auto">
-                            <input type="text" className="form-control" placeholder="Name"/>
+                            <input type="text" className="form-control" name='name' placeholder="Name"/>
                         </div>
                         <div className="col-auto">
-                            <input type="text" className="form-control" placeholder="Status"/>
+                            <input type="text" className="form-control" name='status' placeholder="Status"/>
                         </div>
                         <div className="col-auto">
                             <button type="submit" className="btn btn-primary">Submit</button>
@@ -47,7 +79,12 @@ const Problem1 = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        
+                        {sortedTasks.map((task, index) => (
+                                <tr key={index}>
+                                    <td>{task.name}</td>
+                                    <td>{task.status}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
